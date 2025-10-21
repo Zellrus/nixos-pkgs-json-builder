@@ -1,41 +1,47 @@
-name: Update package metadata
+name: Update Nix packages metadata
 
 on:
   schedule:
     - cron: '0 0 * * *'   # каждый день в 00:00 UTC
-  workflow_dispatch:       # ручной запуск
+  workflow_dispatch:       # ручной запуск вручную
 
 permissions:
-  contents: write          # необходимо для пуша в репозиторий
+  contents: write          # разрешаем пуш в репозиторий
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Проверяем репозиторий
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # полная история, нужна для коммитов
 
-      # 2. Установка зависимостей или подготовка данных
+      # 1. Установка Nix
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+
+      # 2. Подготовка окружения
       - name: Set up environment
         run: |
-          sudo apt-get update
+          sudo apt-get update -y
           sudo apt-get install -y curl wget jq brotli
 
-      # 3. Генерация актуальных JSON
+      # 3. Генерация JSON-файла
       - name: Generate Nix packages JSON
         run: |
           mkdir -p output
+          echo "Generating packages.json..."
           nix-env -qaP --json > output/packages.json
+          echo "Compression..."
+          brotli -f output/packages.json  # создаст packages.json.br
+          echo "Done. File size:"
+          ls -lh output/packages.*
 
-      # 4. Авто-коммит и пуш
+      # 4. Коммит и пуш изменений
       - name: Commit & Push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Update package metadata
+          commit_message: "Update Nix packages metadata"
+          file_pattern: output/
           branch: main
-          push_options: --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
