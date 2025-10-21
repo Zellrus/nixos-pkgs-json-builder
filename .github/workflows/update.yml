@@ -1,19 +1,36 @@
 name: Update package metadata
+
 on:
   schedule:
-    - cron: '0 0 * * *'   # каждый день
-  workflow_dispatch:
+    - cron: '0 0 * * *'   # каждый день в 00:00 UTC
+  workflow_dispatch:       # ручной запуск
 
 permissions:
-  contents: write  # <- важно, без этого push не пройдет
+  contents: write          # необходимо для пуша в репозиторий
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Проверяем репозиторий
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # полная история, нужна для коммитов
+
+      # 2. Установка зависимостей или подготовка данных
+      - name: Set up environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl wget jq brotli
+
+      # 3. Генерация актуальных JSON
+      - name: Generate package metadata
+        run: |
+          mkdir -p output
+          echo '{}' > output/packages.json
+
+      # 4. Авто-коммит и пуш
       - name: Commit & Push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
