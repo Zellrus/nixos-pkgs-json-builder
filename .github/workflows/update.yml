@@ -32,8 +32,5 @@ jobs:
           commit_message: Update package metadata
           branch: main
           push_options: --force
-          commit_user_name: github-actions[bot]
-          commit_user_email: dev@example.com
-          commit_author: Zellrus <Zellrus@users.noreply.github.com>
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
