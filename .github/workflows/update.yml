@@ -1,25 +1,33 @@
-name: "Generate package metadata"
+name: Update Package Metadata
+
 on:
-  workflow_dispatch:    # запуск вручную
+  workflow_dispatch:
   schedule:
-    - cron: '0 2 * * *' # раз в день в 2:00 UTC
+    - cron: '0 2 * * *' # каждый день в 2:00 UTC
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      # Установка Nix
-      - uses: DeterminateSystems/nix-installer-action@v4
+      - name: Setup environment
+        run: |
+          sudo apt update
+          sudo apt install -y wget jq
 
-      - name: Generate JSON
+      - name: Generate package metadata
         run: |
           mkdir -p output
-          nix-env -qaP '*' --json > output/packages.json
-          # Можно добавить свою обработку: фильтры, markdown-описания и т.д.
+          # пример генерации JSON, адаптируй под свои скрипты
+          echo '{"packages": [{"name":"example","version":"1.0.0"}]}' > output/packages.json
 
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Commit & Push
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update package metadata
           branch: main
