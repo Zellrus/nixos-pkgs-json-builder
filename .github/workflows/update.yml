@@ -21,6 +21,8 @@ jobs:
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Update package metadata
-          commit_user_email: dev@example.com
-          commit_author: GitHub Actions <actions@example.com>
+            commit_message: Update package metadata
+            commit_user_email: dev@example.com
+            commit_author: GitHub Actions <actions@example.com>
+            push: true
+            branch: main
