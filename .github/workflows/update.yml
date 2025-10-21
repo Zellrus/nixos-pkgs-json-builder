@@ -25,10 +25,10 @@ jobs:
           sudo apt-get install -y curl wget jq brotli
 
       # 3. Генерация актуальных JSON
-      - name: Generate package metadata
+      - name: Generate Nix packages JSON
         run: |
           mkdir -p output
-          echo '{}' > output/packages.json
+          nix-env -qaP --json > output/packages.json
 
       # 4. Авто-коммит и пуш
       - name: Commit & Push
