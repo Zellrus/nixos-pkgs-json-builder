@@ -24,8 +24,13 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y curl wget jq brotli
+     # 3. Добавление каналов
+      - name: Add nixos channel
+        run: |
+          nix-channel --add https://nixos.org/channels/nixos-25.05 nixos
+          nix-channel --update
 
-      # 3. Генерация JSON-файла
+      # 4. Генерация JSON-файла
       - name: Generate Nix packages JSON
         run: |
           mkdir -p output
@@ -36,7 +41,7 @@ jobs:
           echo "Done. File size:"
           ls -lh output/packages.*
 
-      # 4. Коммит и пуш изменений
+      # 5. Коммит и пуш изменений
       - name: Commit & Push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
