@@ -34,19 +34,27 @@ jobs:
       - name: Generate Nix packages JSON
         run: |
           mkdir -p output
+          DATE=$(date +'%Y-%m-%d')
+          FILE="output/packages-${DATE}.json"
           echo "Generating packages.json..."
-          nix-env -qaP --json > output/packages.json
-          echo "Compression..."
-          brotli -f output/packages.json  # создаст packages.json.br
-          echo "Done. File size:"
-          ls -lh output/packages.*
+          nix-env -qaP --json --meta > "$FILE"
+          echo "Compressing..."
+          brotli -f "$FILE"
+          ls -lh output/
 
-      # 5. Коммит и пуш изменений
-      - name: Commit & Push
-        uses: stefanzweifel/git-auto-commit-action@v4
+      # # 5. Коммит и пуш изменений
+      # - name: Commit & Push
+      #   uses: stefanzweifel/git-auto-commit-action@v4
+      #   with:
+      #     commit_message: "Update Nix packages metadata"
+      #     file_pattern: output/
+      #     branch: main
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload generated JSON as artifact
+        uses: actions/upload-artifact@v4
         with:
-          commit_message: "Update Nix packages metadata"
-          file_pattern: output/
-          branch: main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: nix-packages-${{ steps.date.outputs.today }}
+          path: output/packages-*.json.br
+          retention-days: 30
