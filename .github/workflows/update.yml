@@ -37,7 +37,7 @@ jobs:
           DATE=$(date +'%Y-%m-%d')
           FILE="output/packages-${DATE}.json"
           echo "Generating packages.json..."
-          nix-env -qaP --json --meta > "$FILE"
+          nix-env -f '<nixpkgs>' -qaP --json --meta --option allowUnfree true > "$FILE"
           echo "Compressing..."
           brotli -f "$FILE"
           ls -lh output/
