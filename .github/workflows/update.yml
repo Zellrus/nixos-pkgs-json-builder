@@ -37,7 +37,9 @@ jobs:
           DATE=$(date +'%Y-%m-%d')
           FILE="output/packages-${DATE}.json"
           echo "Generating packages.json..."
-          nix-env -f '<nixpkgs>' -qaP --json --meta --option allowUnfree true > "$FILE"
+          mkdir -p ~/.config/nix
+          echo "allow-unfree = true" >> ~/.config/nix/nix.conf
+          nix-env -qaP --json --meta > "$FILE"
           echo "Compressing..."
           brotli -f "$FILE"
           ls -lh output/
@@ -52,6 +54,10 @@ jobs:
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set date
+        id: date
+        run: echo "today=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+  
       - name: Upload generated JSON as artifact
         uses: actions/upload-artifact@v4
         with:
