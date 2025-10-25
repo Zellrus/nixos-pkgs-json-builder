@@ -24,6 +24,7 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y curl wget jq brotli
+          
      # 3. Добавление каналов
       - name: Add nixos channel
         run: |
@@ -34,33 +35,17 @@ jobs:
       - name: Generate Nix packages JSON
         run: |
           mkdir -p output
-          DATE=$(date +'%Y-%m-%d')
-          FILE="output/packages-${DATE}.json"
+          FILE="output/packages.json"
           echo "Generating packages.json..."
-          mkdir -p ~/.config/nix
-          echo "allow-unfree = true" >> ~/.config/nix/nix.conf
           nix-env -qaP --json --meta > "$FILE"
           echo "Compressing..."
           brotli -f "$FILE"
           ls -lh output/
-
-      # # 5. Коммит и пуш изменений
-      # - name: Commit & Push
-      #   uses: stefanzweifel/git-auto-commit-action@v4
-      #   with:
-      #     commit_message: "Update Nix packages metadata"
-      #     file_pattern: output/
-      #     branch: main
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set date
-        id: date
-        run: echo "today=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-  
+          
+      #5. Загрузка JSON-файла в артефакт
       - name: Upload generated JSON as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nix-packages-${{ steps.date.outputs.today }}
+          name: nix-packages
           path: output/packages-*.json.br
           retention-days: 30
