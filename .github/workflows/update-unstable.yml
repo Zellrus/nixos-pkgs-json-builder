@@ -24,8 +24,8 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y curl wget jq brotli
-          
-     # 3. Добавление каналов
+
+      # 3. Добавление каналов
       - name: Add nixos channel
         run: |
           nix-channel --add https://nixos.org/channels/nixos-unstable nixos
@@ -41,8 +41,8 @@ jobs:
           echo "Compressing..."
           brotli -f "$FILE"
           ls -lh output/
-          
-      #5. Загрузка JSON-файла в артефакт
+
+      # 5. Загрузка JSON-файла в артефакт
       - name: Upload generated JSON as artifact
         uses: actions/upload-artifact@v4
         with:
