@@ -1,0 +1,51 @@
+name: Update Nix unstable packages metadata
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # каждый день в 00:00 UTC
+  workflow_dispatch:       # ручной запуск вручную
+
+permissions:
+  contents: write          # разрешаем пуш в репозиторий
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # 1. Установка Nix
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+
+      # 2. Подготовка окружения
+      - name: Set up environment
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y curl wget jq brotli
+          
+     # 3. Добавление каналов
+      - name: Add nixos channel
+        run: |
+          nix-channel --add https://nixos.org/channels/nixos-unstable nixos
+          nix-channel --update
+
+      # 4. Генерация JSON-файла
+      - name: Generate Nix packages JSON
+        run: |
+          mkdir -p output
+          FILE="output/packages-unstable.json"
+          echo "Generating packages.json..."
+          nix-env -qaP --json --meta > "$FILE"
+          echo "Compressing..."
+          brotli -f "$FILE"
+          ls -lh output/
+          
+      #5. Загрузка JSON-файла в артефакт
+      - name: Upload generated JSON as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nix-packages
+          path: output/packages-unstable.json.br
+          retention-days: 30
