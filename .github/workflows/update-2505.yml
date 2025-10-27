@@ -1,4 +1,4 @@
-name: Update Nix packages metadata
+name: Update Nix 25.05 packages metadata
 
 on:
   schedule:
