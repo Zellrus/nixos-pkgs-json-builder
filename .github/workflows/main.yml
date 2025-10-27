@@ -1,4 +1,4 @@
-name: Update Nix packages metadata
+name: Update Nix 25.05 packages metadata
 
 on:
   schedule:
@@ -35,7 +35,7 @@ jobs:
       - name: Generate Nix packages JSON
         run: |
           mkdir -p output
-          FILE="output/packages.json"
+          FILE="output/packages-2505.json"
           echo "Generating packages.json..."
           nix-env -qaP --json --meta > "$FILE"
           echo "Compressing..."
@@ -47,5 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nix-packages
-          path: output/packages.json.br
+          path: output/packages-2505.json.br
           retention-days: 30
