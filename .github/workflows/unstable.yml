@@ -48,4 +48,4 @@ jobs:
         with:
           name: nix-packages-unstable
           path: output/packages.json.br
-          retention-days: 30
+          retention-days: 5
