@@ -48,4 +48,4 @@ jobs:
         with:
           name: nix-packages-2511
           path: output/packages.json.br
-          retention-days: 30
+          retention-days: 5
